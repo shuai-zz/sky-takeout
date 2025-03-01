@@ -16,6 +16,7 @@
         </where>
         order by sort asc, create_time desc
     </select>
+
     <update id="update" parameterType="category">
         update category
         <set>
@@ -28,4 +29,9 @@
         </set>
         where id = #{id}
     </update>
+    <select id="list" resultType="Category">
+        select * from category where status = 1
+        <if test="type != null"> and type = #{type} </if>
+        order by sort asc,create_time desc
+    </select>
 </mapper>
