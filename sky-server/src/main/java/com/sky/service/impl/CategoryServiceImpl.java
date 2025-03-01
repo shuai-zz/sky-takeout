@@ -34,6 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * 新增分类
+     *
      * @param categoryDTO
      */
     @Override
@@ -53,22 +54,24 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * 分类分页查询
+     *
      * @param categoryPageQueryDTO
      * @return
      */
     @Override
     public PageResult pageQuery(CategoryPageQueryDTO categoryPageQueryDTO) {
         PageHelper.startPage(categoryPageQueryDTO.getPage(), categoryPageQueryDTO.getPageSize());
-        Page<Category> page =categoryMapper.pageQuery(categoryPageQueryDTO);
+        Page<Category> page = categoryMapper.pageQuery(categoryPageQueryDTO);
 
-        long total=page.getTotal();
+        long total = page.getTotal();
         List<Category> records = page.getResult();
 
-        return new PageResult(total,records);
+        return new PageResult(total, records);
     }
 
     /**
      * 根据id删除分类
+     *
      * @param id
      * @return
      */
@@ -76,13 +79,13 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteById(Long id) {
         //查询当前分类是否关联菜品，如果关联抛出异常
         Integer count = dishMapper.countByCategoryId(id);
-        if(count>0){
+        if (count > 0) {
             //当前分类下有菜品，不能删除
             throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
         }
         //查询当前分类是否关联套餐，如果关联抛出异常
-        count=setmealMapper.countByCategoryId(id);
-        if(count>0){
+        count = setmealMapper.countByCategoryId(id);
+        if (count > 0) {
             //当前分类下有菜品，不能删除
             throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_SETMEAL);
         }
@@ -91,6 +94,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * 修改分类
+     *
      * @param categoryDTO
      */
     @Override
@@ -99,6 +103,23 @@ public class CategoryServiceImpl implements CategoryService {
         BeanUtils.copyProperties(categoryDTO, category);
         category.setUpdateTime(LocalDateTime.now());
         category.setUpdateUser(BaseContext.getCurrentId());
+        categoryMapper.update(category);
+    }
+
+    /**
+     * 启用禁用分类
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Category category = Category.builder()
+                .id(id)
+                .status(status)
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
         categoryMapper.update(category);
     }
 }
