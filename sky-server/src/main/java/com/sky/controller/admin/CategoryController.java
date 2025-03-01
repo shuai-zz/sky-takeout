@@ -1,7 +1,9 @@
 package com.sky.controller.admin;
 
+
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
+import com.sky.entity.Category;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
@@ -9,8 +11,10 @@ import com.sky.service.EmployeeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 /**
  * 分类管理
@@ -61,6 +65,18 @@ public class CategoryController {
     public Result<String> deleteById(Long id) {
         log.info("根据id删除分类：{}",id);
         categoryService.deleteById(id);
+        return Result.success();
+    }
+
+    /**
+     * 修改分类
+     * @param categoryDTO
+     */
+    @PutMapping
+    @ApiOperation("修改分类")
+    public Result<String> update(@RequestBody CategoryDTO categoryDTO) {
+        log.info("修改分类: {}", categoryDTO);
+        categoryService.update(categoryDTO);
         return Result.success();
     }
 

@@ -31,4 +31,10 @@ public interface CategoryMapper {
      */
     @Delete("delete from sky_take_out.category where id =  #{id}")
     void deleteById(Long id);
+
+    /**
+     * 修改分类
+     * @param category
+     */
+    void update(Category category);
 }
