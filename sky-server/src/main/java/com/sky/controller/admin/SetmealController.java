@@ -51,6 +51,11 @@ public class SetmealController {
     }
 
 
+    /**
+     * 删除套餐
+     * @param ids
+     * @return
+     */
     @DeleteMapping
     @ApiOperation("删除套餐")
     public Result delete(@RequestParam List<Long> ids) {
@@ -59,6 +64,32 @@ public class SetmealController {
         return Result.success();
     }
 
+
+    /**
+     * 根据id查询套餐
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询套餐")
+    public Result<SetmealVO> getById(@PathVariable Long id) {
+        log.info("根据id查询套餐：{}",id);
+        SetmealVO setmealVO =  setmealService.getByIdWithDish(id);
+        return Result.success(setmealVO);
+    }
+
+    /**
+     * 修改套餐
+     * @param setmealDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("修改套餐")
+    public Result update(@RequestBody SetmealDTO setmealDTO) {
+        log.info("修改套餐:{}",setmealDTO);
+        setmealService.updateWithDish(setmealDTO);
+        return Result.success();
+    }
 
 
 

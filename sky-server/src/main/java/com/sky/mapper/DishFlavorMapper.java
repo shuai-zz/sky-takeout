@@ -23,7 +23,7 @@ public interface DishFlavorMapper {
 
     /**
      * 根据菜品id查询口味数据
-     * @param id
+     * @param dishId
      * @return
      */
     @Select("select * from sky_take_out.dish_flavor where dish_id = #{dishId}")

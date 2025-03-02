@@ -7,6 +7,7 @@ import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -91,5 +93,45 @@ public class SetmealServiceImpl implements SetmealService {
         //删除setmeal_dish表中的项
         setmealDishMapper.deleteByIds(ids);
 
+    }
+
+    /**
+     * 根据id查询套餐
+     * @param id
+     * @return
+     */
+    @Override
+    public SetmealVO getByIdWithDish(Long id) {
+        //根据id查询套餐数据
+        Setmeal setmeal = setmealMapper.getById(id);
+        //根据套餐id查询菜品信息
+        List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
+        //将查询到的数据封装到setmealVO对象中
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal, setmealVO);
+        setmealVO.setSetmealDishes(setmealDishes);
+        return setmealVO;
+    }
+
+    /**
+     * 根据id修改
+     * @param setmealDTO
+     */
+    @Override
+    public void updateWithDish(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+        //修改套餐基本信息
+        setmealMapper.update(setmeal);
+        //删除原有的菜品数据
+        setmealDishMapper.deleteByIds(Collections.singletonList(setmealDTO.getId()));
+        //重新插入菜品数据
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        if(setmealDishes != null&&!setmealDishes.isEmpty()){
+            setmealDishes.forEach(setmealDish -> {
+                setmealDish.setSetmealId(setmeal.getId());
+            });
+        }
+        setmealDishMapper.insertBatch(setmealDishes);
     }
 }
