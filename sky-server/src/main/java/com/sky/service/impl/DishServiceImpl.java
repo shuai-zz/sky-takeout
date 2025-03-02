@@ -33,6 +33,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 新增菜品
+     *
      * @param dishDTO
      */
     @Override
@@ -63,6 +64,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 菜品分页查询
+     *
      * @param dishPageQueryDTO
      * @return
      */
@@ -75,6 +77,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 菜品批量删除
+     *
      * @param ids
      */
     @Transactional
@@ -83,13 +86,13 @@ public class DishServiceImpl implements DishService {
         //判断当前菜品能否被删除：是否启售
         for (Long id : ids) {
             Dish dish = dishMapper.getById(id);
-            if(Objects.equals(dish.getStatus(), StatusConstant.ENABLE)){
+            if (Objects.equals(dish.getStatus(), StatusConstant.ENABLE)) {
                 throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
             }
         }
         //判断当前菜品能否被删除：是否被关联
         List<Long> setmealIds = setmealDishMapper.getSetmealDishIdsBySetmealIds(ids);
-        if(setmealIds != null && setmealIds.size() > 0){
+        if (setmealIds != null && setmealIds.size() > 0) {
             //当前菜品被套餐关联，不能删除
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
@@ -101,6 +104,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 根据id查询数据
+     *
      * @param id
      * @return
      */
@@ -109,7 +113,7 @@ public class DishServiceImpl implements DishService {
         //根据id查询菜品数据
         Dish dish = dishMapper.getById(id);
         //根据菜品id查询口味数据
-        List<DishFlavor> dishFlavors=dishFlavorMapper.getByDishId(id);
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);
         //将查询到的数据封装到DishVO对象
         DishVO dishVO = new DishVO();
         BeanUtils.copyProperties(dish, dishVO);
@@ -119,6 +123,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 修改
+     *
      * @param dishDTO
      */
     @Override
@@ -141,6 +146,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 根据categoryId查询菜品
+     *
      * @param categoryId
      * @return
      */
@@ -151,5 +157,20 @@ public class DishServiceImpl implements DishService {
                 .status(StatusConstant.ENABLE)
                 .build();
         return dishMapper.list(dish);
+    }
+
+    /**
+     * 启售禁售菜品
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder()
+                    .status(status)
+                    .id(id)
+                    .build();
+        dishMapper.update(dish);
     }
 }

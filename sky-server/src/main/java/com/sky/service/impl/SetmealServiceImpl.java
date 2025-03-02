@@ -134,4 +134,29 @@ public class SetmealServiceImpl implements SetmealService {
         }
         setmealDishMapper.insertBatch(setmealDishes);
     }
+
+    /**
+     * 启用禁用套餐
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        //启售套餐时，判断套餐内是否有停售菜品，有则提示套餐内包含未启售菜品，无法启售
+        if(Objects.equals(status, StatusConstant.ENABLE)){
+            List<Dish> dishList = dishMapper.getBySetmealId(id);
+            if(dishList!=null&&!dishList.isEmpty()){
+                dishList.forEach(dish -> {
+                    if(Objects.equals(dish.getStatus(), StatusConstant.DISABLE)){
+                        throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                    }
+                });
+            }
+        }
+        Setmeal setmeal = Setmeal.builder()
+                .status(status)
+                .id(id)
+                .build();
+        setmealMapper.update(setmeal);
+    }
 }
