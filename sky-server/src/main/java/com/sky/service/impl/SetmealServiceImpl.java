@@ -40,6 +40,7 @@ public class SetmealServiceImpl implements SetmealService {
     @Override
     @Transactional
     public void saveWithDish(SetmealDTO setmealDTO) {
+
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
     //向setmeal表中插入数据
