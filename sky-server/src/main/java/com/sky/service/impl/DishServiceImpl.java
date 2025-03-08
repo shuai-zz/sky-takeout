@@ -15,6 +15,7 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
+import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -172,5 +173,29 @@ public class DishServiceImpl implements DishService {
                     .id(id)
                     .build();
         dishMapper.update(dish);
+    }
+
+    /**
+     * 根据id查询菜品-口味
+     * @param dish
+     * @return
+     */
+    @Override
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList=dishMapper.list(dish);
+        List<DishVO> dishVOList=new ArrayList<>();
+        //遍历dishList，分别查询口味
+        for(Dish d:dishList){
+            DishVO dishVO=new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+            //获取到d对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
+            //将对应口味添加到dishVO对象中
+            dishVO.setFlavors(flavors);
+            //将dishVO对象添加到dishVOList中
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
     }
 }
